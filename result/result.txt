@@ -1,0 +1,18 @@
+
+Test set: Average loss: 0.0103, Accuracy: 4444/10000 (44.440%)
+
+Test set: Average loss: 0.0101, Accuracy: 4591/10000 (45.910%)
+
+Test set: Average loss: 0.0094, Accuracy: 4890/10000 (48.900%)
+
+Test set: Average loss: 0.0086, Accuracy: 5411/10000 (54.110%)
+
+Test set: Average loss: 0.0081, Accuracy: 5667/10000 (56.670%)
+
+Test set: Average loss: 0.0076, Accuracy: 5948/10000 (59.480%)
+
+Test set: Average loss: 0.0075, Accuracy: 6035/10000 (60.350%)
+
+Test set: Average loss: 0.0071, Accuracy: 6350/10000 (63.500%)
+
+Test set: Average loss: 0.0069, Accuracy: 6415/10000 (64.150%)

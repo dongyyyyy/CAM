@@ -1,10 +1,3 @@
-import torch
-import torch.nn as nn
-import os
-from torch.utils.data import DataLoader
-from torchvision import datasets, transforms
-from torchsummary import summary
-from models.resnet18 import *
 from dataset.dataset_load import *
 from torch.autograd import Variable
 
@@ -44,7 +37,7 @@ def fine_tuning(trainloader, model, epoch, criterion, optimizer, scheduler):
         #print()
         #print('Train Epoch: {}\tAverage Loss: {:.3f}\tAverage Accuracy: {:.3f}%'.format(epoch, loss_avg, acc_avg))
 
-        scheduler.step()
+        #scheduler.step()
 
         with open('result/train_acc.txt', 'a') as f:
             f.write(str(acc_avg))
@@ -74,7 +67,7 @@ def test(testloader, model, criterion, epoch):
     print(result)
 
 
-    torch.save(model.state_dict(), 'checkpoint/' + str(int(epoch+1)) + '.pt')
+    torch.save(model.state_dict(), 'checkpoint/' + str(int(epoch)) + '.pt')
     with open('result/result.txt', 'a') as f:
         f.write(result)
     f.close()

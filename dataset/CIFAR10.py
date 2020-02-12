@@ -1,5 +1,6 @@
 import torch
 import torchvision
+from PIL import Image
 import torchvision.transforms as transforms
 import matplotlib.pyplot as plt
 import numpy as np
@@ -16,12 +17,19 @@ CIFAR_classes = ('plane', 'car', 'bird', 'cat',
 
 
 transform = transforms.Compose([
-    transforms.RandomResizedCrop(224),
+    transforms.Resize((128,128),interpolation= Image.BICUBIC),
+    #transforms.RandomResizedCrop(128),
     transforms.RandomHorizontalFlip(),
     transforms.ToTensor(),
     normalize
 ])
 
+transform_test = transforms.Compose([
+    transforms.Resize((128,128),interpolation= Image.BICUBIC),
+    #transforms.RandomResizedCrop(128),
+    transforms.ToTensor(),
+    normalize
+])
 class UnNormalize(object):
     def __init__(self):
         self.mean = mean
@@ -38,13 +46,22 @@ def CIFAR10(batch_size = 100):
                                               shuffle=True, num_workers=2)
 
     testset = torchvision.datasets.CIFAR10(root='dataset/CIFAR10/', train=False,
-                                           download=True, transform=transform)
+                                           download=True, transform=transform_test)
 
     testloader = torch.utils.data.DataLoader(testset, batch_size=batch_size,
-                                             shuffle=False, num_workers=2)
+                                             shuffle=True, num_workers=2)
     # functions to show an image
     return trainloader,testloader
 
+
+def CIFAR10_test(batch_size = 100):
+    testset = torchvision.datasets.CIFAR10(root='dataset/CIFAR10/', train=False,
+                                           download=True, transform=transform_test)
+
+    testloader = torch.utils.data.DataLoader(testset, batch_size=batch_size,
+                                             shuffle=True, num_workers=2)
+    # functions to show an image
+    return testloader
 
 def imshow(img):
     npimg = img.numpy()

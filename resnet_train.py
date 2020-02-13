@@ -13,8 +13,12 @@ def fine_tuning(trainloader, model, epoch, criterion, optimizer, scheduler):
     for batch_idx, (data, target) in enumerate(trainloader):
         data, target = data.cuda(), target.cuda()
         data, target = Variable(data), Variable(target)
+
+        # scheduler.step()
+
         optimizer.zero_grad()
         output= model(data)
+
 
         correct += (torch.max(output,1)[1].view(target.size()).data == target.data).sum()
         total += trainloader.batch_size
@@ -37,14 +41,13 @@ def fine_tuning(trainloader, model, epoch, criterion, optimizer, scheduler):
         #print()
         #print('Train Epoch: {}\tAverage Loss: {:.3f}\tAverage Accuracy: {:.3f}%'.format(epoch, loss_avg, acc_avg))
 
-        #scheduler.step()
-
         with open('result/train_acc.txt', 'a') as f:
             f.write(str(acc_avg))
         f.close()
         with open('result/train_loss.txt', 'a') as f:
             f.write(str(loss_avg))
         f.close()
+    torch.save(model.state_dict(), 'checkpoint/' + str(int(epoch)) + '.pt')
 
 def test(testloader, model, criterion, epoch):
     model.eval()
@@ -57,7 +60,7 @@ def test(testloader, model, criterion, epoch):
         # sum up batch loss
         test_loss += criterion(output, target).item()
         # get the index of the max log-probability
-        pred = output.data.max(1, keepdim=True)[1]
+        pred = output.data.max(1, keepdim=True)[1] # 최대값
         correct += pred.eq(target.data.view_as(pred)).cpu().sum()
 
     test_loss /= len(testloader.dataset)
@@ -67,7 +70,6 @@ def test(testloader, model, criterion, epoch):
     print(result)
 
 
-    torch.save(model.state_dict(), 'checkpoint/' + str(int(epoch)) + '.pt')
     with open('result/result.txt', 'a') as f:
         f.write(result)
     f.close()

@@ -81,7 +81,7 @@ if __name__ == "__main__":
     # hook the feature extractor
     features_blobs = []
     def hook_feature(module, input, output):
-        print(output)
+        print(output.shape)
         features_blobs.append(output.data.cpu().numpy())
 
     resnet18_custom._modules.get(final_layer).register_forward_hook(hook_feature)

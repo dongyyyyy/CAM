@@ -14,11 +14,14 @@ def returnCAM(feature_conv, weight_softmax, class_idx):
     bz, nc, h, w = feature_conv.shape
     output_cam = []
     for idx in class_idx:
-        cam = weight_softmax[class_idx].dot(feature_conv.reshape((nc, h*w)))
-        cam = cam.reshape(h, w)
-        cam = cam - np.min(cam)
-        cam_img = cam / np.max(cam)
-        cam_img = np.uint8(255 * cam_img)
+        cam = weight_softmax[class_idx].dot(feature_conv.reshape((nc, h*w))) # [1X512].dot([512,h*w(4X4)]) 하나의 클래스에 대해서
+        cam = cam.reshape(h, w) # [1X16] -> [4X4]
+        cam = cam - np.min(cam) # 가장 작은 값을 0으로 정규화 ( CAM으로 표시시 색깔 표현을 위한 )
+        print("cam : ",cam)
+        cam_img = cam / np.max(cam) # max로 나누는 경우 최대값은 1로 정규화
+        print("cam : ",cam_img)
+        cam_img = np.uint8(255 * cam_img) # 0~1사이의 값을 0~255값으로 정규화
+        print("cam : ", cam_img)
         output_cam.append(cv2.resize(cam_img, size_upsample))
     return output_cam
 
@@ -28,8 +31,12 @@ def get_cam_CIFAR10(net, features_blobs, classes):
     _, testloader = CIFAR10(batch_size=1)
 
     params = list(net.parameters())
-    weight_softmax = np.squeeze(params[-2].data.cpu().numpy())
-
+    weight_softmax = np.squeeze(params[-2].data.cpu().numpy()) # parameter fully connected layer input =  512 output = 10
+    # weight_softmax.shape = (10,512) 10 = output_channel 512 = input_channel
+    '''
+    for idx,params_print in enumerate(params):
+        print(idx,":",np.array(params_print.data.cpu()).shape)
+    '''
     normalize = transforms.Normalize(
         mean=[0.485, 0.456, 0.406],
         std=[0.229, 0.224, 0.225]
@@ -66,8 +73,8 @@ def get_cam_CIFAR10(net, features_blobs, classes):
 
         img = cv2.imread('./checkCAM/origin%d.jpg'%count)
         height, width, _ = img.shape
-        CAM = cv2.resize(CAMs[0], (width, height))
-        heatmap = cv2.applyColorMap(CAM, cv2.COLORMAP_JET)
+        CAM = cv2.resize(CAMs[0], (width, height)) # [4X4] -> [128X128]
+        heatmap = cv2.applyColorMap(CAM, cv2.COLORMAP_JET) # cv2.COLORMAP_JET => 0 : 파란색 255 : 빨간색
         result = heatmap * 0.3 + img * 0.5
         result = cv2.resize(result,(224,224))
         cv2.imwrite('./checkCAM/result%d.jpg'%count, result)
